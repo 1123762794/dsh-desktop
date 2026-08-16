@@ -1,0 +1,29 @@
+appId: com.deepseek.dsh-desktop
+productName: DSH Desktop
+directories:
+  buildResources: build
+  output: dist
+files:
+  - src/**/*
+  - package.json
+  - "!**/*.map"
+asar: true
+compression: normal
+win:
+  icon: build/icon.ico
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: portable
+      arch:
+        - x64
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: DSH Desktop
+portable:
+  artifactName: DSH-Desktop-${version}-portable.${ext}

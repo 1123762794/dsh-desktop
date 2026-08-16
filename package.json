@@ -1,0 +1,22 @@
+{
+  "name": "dsh-desktop",
+  "productName": "DSH Desktop",
+  "version": "0.1.0",
+  "description": "DeepSeek Harness 极简桌面客户端：一键拉起 dsh web 并打开原生窗口。",
+  "main": "src/main.js",
+  "type": "commonjs",
+  "license": "MIT",
+  "author": "DSH Desktop contributors",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist:portable": "electron-builder --win portable",
+    "icons": "node scripts/make-icons.cjs"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "electron": "^43.4.0",
+    "electron-builder": "^26.15.3"
+  }
+}

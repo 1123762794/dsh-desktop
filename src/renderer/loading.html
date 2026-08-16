@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>DSH Desktop</title>
+<style>
+  /* Codex 风启动页：Mica 透出 + 顶部原生拖拽条 + 居中加载态（自包含） */
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: transparent;            /* 透出窗口 Mica 材质 */
+    color: #ededed;
+    font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── caption 拖拽条（与 codex-theme.css 的 #dsh-caption 同构） ── */
+  #dsh-caption {
+    position: fixed; top: 0; height: 32px;
+    z-index: 2147483645;
+    background: transparent;
+    -webkit-app-region: drag;
+    user-select: none;
+    pointer-events: auto;
+  }
+  #dsh-caption--win { left: 0; right: 138px; }
+  #dsh-caption--mac { left: 80px; right: 0; }
+
+  /* ── 加载态 ── */
+  .stage {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 18px; padding: 0 24px;
+  }
+  .spinner {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.12); border-top-color: #d97757;
+    animation: spin .9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  h1 { margin: 0; font-size: 15px; font-weight: 500; letter-spacing: .02em; color: #ededed; }
+  #status { margin: 0; font-size: 12px; color: rgba(255,255,255,.5); }
+  #detail { margin: 0; font-size: 11px; color: rgba(255,255,255,.3); white-space: pre-wrap; text-align: center; }
+  .err .spinner { border-top-color: #f0524d; }
+  .ok  .spinner { border-top-color: #4cc38a; }
+  #btn-open {
+    margin-top: 4px; appearance: none; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08);
+    color: #ededed; font-size: 12px; padding: 7px 16px; border-radius: 8px; cursor: pointer;
+  }
+  #btn-open:hover { background: rgba(255,255,255,.14); }
+</style>
+</head>
+<body>
+  <div id="dsh-caption" class="dsh-caption--win" aria-hidden="true"></div>
+
+  <div class="stage" id="card">
+    <div class="spinner"></div>
+    <h1>DeepSeek Harness</h1>
+    <p id="status">正在启动…</p>
+    <p id="detail"></p>
+    <button id="btn-open" hidden>在浏览器中打开</button>
+  </div>
+
+  <script>
+    const api = window.dshDesktop
+    const wc = api && api.windowControls
+    const card = document.getElementById('card')
+    const status = document.getElementById('status')
+    const detail = document.getElementById('detail')
+    const btn = document.getElementById('btn-open')
+    const TEXTS = { starting: '正在启动…', ready: '正在打开…', error: '启动失败' }
+    function render(s) {
+      s = s || { state: 'starting', detail: '' }
+      status.textContent = TEXTS[s.state] || s.state
+      detail.textContent = s.detail || ''
+      card.className = 'stage ' + (s.state === 'error' ? 'err' : s.state === 'ready' ? 'ok' : '')
+      btn.hidden = !s.url
+    }
+    btn.addEventListener('click', () => api.openExternal())
+    api.getState().then(render)
+    api.onStatus(render)
+
+    // caption 拖拽条：平台化避让 + 双击最大化
+    const isMac = /Mac|iPhone|iPad|iPod/i.test(navigator.platform || '')
+    const cap = document.getElementById('dsh-caption')
+    cap.className = isMac ? 'dsh-caption--mac' : 'dsh-caption--win'
+    cap.addEventListener('dblclick', () => wc && wc.toggleMaximize())
+  </script>
+</body>
+</html>

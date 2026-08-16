@@ -1,0 +1,159 @@
+/* ============================================================
+   dsh-desktop · Codex 桌面端风格主题（Windows 原生控件 + Mica 版）
+   方案参考 anywhere-labs/deepseek-harness-desktop 高级模式：
+   - 窗口：titleBarOverlay 原生按钮 + Mica 材质（main.js 提供）
+   - 页面：顶部 32px caption 拖拽条（preload 注入 #dsh-caption）
+   - 深色下侧栏透明，透出 Mica 毛玻璃
+   由 main.js 在 did-finish-load / did-navigate 时 insertCSS 注入。
+   ============================================================ */
+
+/* ---------- 1. 顶部 caption 拖拽条 ---------- */
+
+#dsh-caption {
+  position: fixed;
+  top: 0;
+  height: 32px;
+  z-index: 2147483645;
+  background: transparent;
+  -webkit-app-region: drag;   /* 原生拖拽区 */
+  user-select: none;
+  pointer-events: auto;
+}
+#dsh-caption--win { left: 0; right: 138px; }   /* 避让右上角三个原生窗口按钮 */
+#dsh-caption--mac { left: 80px; right: 0; }    /* 避让左上角红绿灯 */
+
+/* 弹窗（modal/dialog）打开时禁用拖拽区，避免遮挡弹窗顶部交互 */
+html:has([aria-modal="true"]) #dsh-caption {
+  -webkit-app-region: no-drag !important;
+  pointer-events: none !important;
+}
+
+/* ---------- 2. 页面内容让出 caption ---------- */
+
+html, body {
+  margin: 0 !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+}
+body {
+  padding-top: 32px !important;          /* caption 高度 */
+}
+
+/* ---------- 3. 深色主题：Codex token 覆盖 + 侧栏透出 Mica ---------- */
+/* 挂 body[data-ds-dark-theme] 下：外观设置切换浅色/深色时真正有反应
+   （浅色主题恢复 DSH 原版外观）。 */
+
+body[data-ds-dark-theme] {
+  color-scheme: dark;
+  background: transparent !important;    /* 透出窗口 Mica 材质 */
+
+  --dsw-alias-bg-base: #0a0a0a !important;
+  --dsw-alias-bg-layer-1: #111111 !important;
+  --dsw-alias-bg-layer-2: #161616 !important;
+  --dsw-alias-bg-layer-3: #1c1c1c !important;
+  --dsw-alias-bg-overlay: #181818 !important;
+  --dsw-alias-bg-mask-1: rgba(10,10,10,.6) !important;
+  --dsw-alias-bg-mask-2: rgba(10,10,10,.8) !important;
+  --dsw-alias-bg-mask-3: rgba(10,10,10,.95) !important;
+  --dsw-alias-bg-skeleton: #1a1a1a !important;
+
+  /* 侧栏透明，透出 Mica 毛玻璃（Codex Windows 质感关键） */
+  --dsw-specific-sidebar-fill: transparent !important;
+  --dsw-specific-sidebar-nav-item-hover: rgba(255,255,255,.05) !important;
+  --dsw-specific-sidebar-nav-item-active: #161616 !important;
+  --dsw-specific-bubble: #1f1f1f !important;
+  --dsw-specific-bubble-highlight: #232323 !important;
+  --dsw-specific-input-major: #101010 !important;
+  --dsw-specific-menu: #161616 !important;
+  --dsw-specific-selector: #161616 !important;
+  --dsw-specific-tip: #131313 !important;
+
+  --dsw-alias-border-l1: #1f1f1f !important;
+  --dsw-alias-border-l2: #2b2b2b !important;
+  --dsw-alias-border-l2-darkmode-thin: #232323 !important;
+  --dsw-alias-border-l3: #3a3a3a !important;
+  --dsw-alias-border-l4: #4a4a4a !important;
+  --dsw-alias-border-inverted: #ededed !important;
+
+  --dsw-alias-label-primary: #ededed !important;
+  --dsw-alias-label-primary-dimmed: #c9c9c9 !important;
+  --dsw-alias-label-primary-bluish: #e8e8e8 !important;
+  --dsw-alias-label-secondary: #a6a6a6 !important;
+  --dsw-alias-label-tertiary: #707070 !important;
+  --dsw-alias-label-caption: #525252 !important;
+  --dsw-alias-label-dimmed: #8a8a8a !important;
+
+  /* Codex 暖琥珀强调色（替代 DeepSeek 蓝） */
+  --dsw-alias-brand-primary: #d97757 !important;
+  --dsw-alias-brand-primary-invert: #0a0a0a !important;
+  --dsw-alias-brand-text: #e08a6b !important;
+  --dsw-alias-button-primary-fill: #d97757 !important;
+  --dsw-alias-button-primary-hover: #e08a6b !important;
+  --dsw-alias-button-primary-dimmed: rgba(217,119,87,.25) !important;
+  --dsw-alias-interactive-bg-hover-accent: rgba(217,119,87,.12) !important;
+
+  --dsw-alias-interactive-bg-hover: rgba(255,255,255,.06) !important;
+  --dsw-alias-interactive-bg-hover-solid: rgba(255,255,255,.09) !important;
+  --dsw-alias-interactive-bg-active: rgba(255,255,255,.11) !important;
+  --dsw-alias-interactive-bg-hover-danger: rgba(244,63,94,.14) !important;
+
+  --dsw-alias-button-floating-fill: #181818 !important;
+  --dsw-alias-button-floating-hover: #222222 !important;
+  --dsw-alias-button-elevated-fill: #1c1c1c !important;
+  --dsw-alias-button-contrast-fill: #ededed !important;
+  --dsw-alias-button-tool-bar-fill: #161616 !important;
+  --dsw-alias-button-tool-bar-hover: #222222 !important;
+
+  --dsw-alias-markdown-code-block: #131313 !important;
+  --dsw-alias-markdown-code-block-banner: #171717 !important;
+  --dsw-alias-markdown-inline-code: rgba(255,255,255,.08) !important;
+  --dsw-alias-markdown-tag: rgba(217,119,87,.14) !important;
+  --dsw-alias-markdown-placeholder: #4a4a4a !important;
+
+  --dsw-alias-state-success-primary: #4cc38a !important;
+  --dsw-alias-state-success-secondary: rgba(76,195,138,.18) !important;
+  --dsw-alias-state-error-primary: #f0524d !important;
+  --dsw-alias-state-error-secondary: rgba(240,82,77,.16) !important;
+  --dsw-alias-state-warn-primary: #e0a93b !important;
+  --dsw-alias-state-warn-secondary: rgba(224,169,59,.18) !important;
+  --dsw-alias-state-warn-tertiary: rgba(224,169,59,.1) !important;
+  --dsw-alias-state-business-primary: #d97757 !important;
+  --dsw-alias-state-business-tertiary: rgba(217,119,87,.12) !important;
+
+  --dsw-alias-toast-bg: #1a1a1a !important;
+  --dsw-alias-tooltip-bg: #1c1c1c !important;
+  --dsw-alias-scrollbar-bg-l1: rgba(255,255,255,.05) !important;
+  --dsw-alias-scrollbar-bg-l2: rgba(255,255,255,.09) !important;
+  --dsw-alias-scrollbar-hover-l1: rgba(255,255,255,.12) !important;
+  --dsw-alias-scrollbar-hover-l2: rgba(255,255,255,.16) !important;
+}
+
+/* ---------- 4. 组件级微调（仅深色主题，圆角 / 间距 / 气泡） ---------- */
+
+/* 用户消息气泡：Codex 风格 —— 右对齐深灰块、小圆角 */
+body[data-ds-dark-theme] .gdEzaW_bubble {
+  border-radius: 12px !important;
+}
+
+/* 输入卡：更收敛的圆角（Codex 输入框风格） */
+body[data-ds-dark-theme] .uV2eYG_card {
+  border-radius: 16px !important;
+  border-color: #232323 !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,.35) !important;
+}
+
+/* 三栏框架分隔线 */
+body[data-ds-dark-theme] .pI_x6G_sidebarCol { border-right-color: #1f1f1f !important; }
+body[data-ds-dark-theme] .pI_x6G_detailsCol { border-left-color: #1f1f1f !important; }
+
+/* 对话流滚动区略加呼吸感 */
+body[data-ds-dark-theme] .Md3f7G_scroll { padding-top: 24px !important; }
+
+/* 代码块圆角与边框更贴合深色 */
+body[data-ds-dark-theme] .Md3f7G_column pre,
+body[data-ds-dark-theme] [data-markdown] pre {
+  border-radius: 10px !important;
+}
+
+/* 侧栏会话条目 hover 圆角 */
+body[data-ds-dark-theme] [data-sidebar] [role="button"] { border-radius: 8px !important; }
