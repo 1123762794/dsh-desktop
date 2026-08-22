@@ -145,9 +145,9 @@ function injectTokenPill() {
       '  <div class="dsh-tp-note">金额为本地日志按官方价的估算值</div>' +
       '</div>'
     pill.style.cssText = [
-      'position:fixed', 'top:40px', 'right:12px', 'z-index:2147483646',
-      'display:inline-flex', 'align-items:center', 'gap:6px',
-      'padding:4px 10px', 'font-size:11px', 'line-height:16px',
+      'position:fixed', 'top:10px', 'right:12px', 'z-index:2147483646',
+      'display:inline-flex', 'align-items:center', 'gap:8px',
+      'padding:6px 14px', 'height:32px', 'font-size:12px', 'line-height:16px',
       'font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif',
       'color:rgba(237,237,237,.85)', 'background:rgba(16,16,16,.72)',
       'border:1px solid rgba(255,255,255,.14)', 'border-radius:999px',
