@@ -65,23 +65,34 @@ function injectCaptionStrip() {
  */
 function injectBrowserButton() {
   try {
-    if (!location.href.startsWith('http://')) return // 只注入到 DSH 页面
+    if (!location.href.startsWith('http://')) return
     if (document.getElementById('dsh-browser-btn')) return
+    const isDark = () => document.body && document.body.hasAttribute('data-ds-dark-theme')
     const btn = document.createElement('button')
     btn.id = 'dsh-browser-btn'
     btn.title = '在系统浏览器中打开 DeepSeek Harness'
     btn.setAttribute('aria-label', '在浏览器中打开')
     btn.innerHTML = '<span class="dsh-browser-ico">&#8599;</span><span class="dsh-browser-label">在浏览器中打开</span>'
+    function applyBtnTheme() {
+      const dark = isDark()
+      btn.style.color = dark ? 'rgba(237,237,237,.85)' : 'rgba(20,20,20,.82)'
+      btn.style.background = dark ? 'rgba(16,16,16,.72)' : 'rgba(255,255,255,.78)'
+      btn.style.borderColor = dark ? 'rgba(255,255,255,.14)' : 'rgba(0,0,0,.1)'
+    }
     btn.style.cssText = [
       'position:fixed', 'right:12px', 'bottom:12px', 'z-index:2147483646',
       'display:inline-flex', 'align-items:center', 'gap:6px',
       'padding:6px 12px', 'font-size:12px', 'line-height:1',
-      'font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif',
-      'color:rgba(237,237,237,.85)', 'background:rgba(16,16,16,.72)',
-      'border:1px solid rgba(255,255,255,.14)', 'border-radius:999px',
-      'cursor:pointer', 'opacity:.45', 'transition:opacity .15s, background .15s',
+      'font-family:inherit',
+      'border-radius:999px',
+      'cursor:pointer', 'opacity:.45', 'transition:opacity .15s, background .15s, color .15s, border-color .15s',
       'backdrop-filter:blur(8px)', 'box-shadow:0 2px 8px rgba(0,0,0,.3)',
     ].join(';')
+    applyBtnTheme()
+    new MutationObserver(applyBtnTheme).observe(
+      document.body || document.documentElement,
+      { attributes: true, attributeFilter: ['data-ds-dark-theme'] }
+    )
     btn.addEventListener('mouseenter', () => { btn.style.opacity = '1' })
     btn.addEventListener('mouseleave', () => { btn.style.opacity = '.45' })
     btn.addEventListener('click', (e) => {
@@ -162,6 +173,20 @@ function injectTokenPill() {
       '#dsh-token-pill .dsh-tp-line span{opacity:.6}#dsh-token-pill .dsh-tp-line b{font-weight:500;font-variant-numeric:tabular-nums}',
       '#dsh-token-pill .dsh-tp-sep{height:1px;background:rgba(255,255,255,.1);margin:7px 0}',
       '#dsh-token-pill .dsh-tp-note{margin-top:7px;font-size:10px;opacity:.4;line-height:14px}',
+      /* 浅色主题（body 无 data-ds-dark-theme 时） */
+      '#dsh-token-pill.dsh-tp-light{color:rgba(20,20,20,.88);background:rgba(255,255,255,.82);border-color:rgba(0,0,0,.12);box-shadow:0 2px 8px rgba(0,0,0,.12)}',
+      '#dsh-token-pill.dsh-tp-light .dsh-tp-dot{background:var(--dsw-alias-state-success-primary,#2da44e)}',
+      '#dsh-token-pill.dsh-tp-light.warn{border-color:#d29922}',
+      '#dsh-token-pill.dsh-tp-light.bad{border-color:#cf222e}',
+      '#dsh-token-pill.dsh-tp-light .dsh-tp-panel{background:rgba(255,255,255,.96);border-color:rgba(0,0,0,.12);color:rgba(20,20,20,.88);box-shadow:0 4px 16px rgba(0,0,0,.15)}',
+      '#dsh-token-pill.dsh-tp-light .dsh-tp-head b{color:#1b1f24}',
+      '#dsh-token-pill.dsh-tp-light .dsh-tp-line span{opacity:.55}',
+      '#dsh-token-pill.dsh-tp-light .dsh-tp-line b{color:#1b1f24}',
+      '#dsh-token-pill.dsh-tp-light .dsh-tp-sep{background:rgba(0,0,0,.08)}',
+      '#dsh-token-pill.dsh-tp-light .dsh-tp-fill{background:#2da44e}',
+      '#dsh-token-pill.dsh-tp-light.warn .dsh-tp-fill{background:#d29922}',
+      '#dsh-token-pill.dsh-tp-light.bad .dsh-tp-fill{background:#cf222e}',
+      '#dsh-token-pill.dsh-tp-light .dsh-tp-meter{background:rgba(0,0,0,.08)}',
     ].join('')
     document.head.appendChild(style)
     document.body.appendChild(pill)
@@ -184,6 +209,15 @@ function injectTokenPill() {
     document.addEventListener('click', (e) => {
       if (!pill.contains(e.target)) panel.style.display = 'none'
     })
+
+    // 主题跟随：DSH 用 body[data-ds-dark-theme] 标记深色；有=深色，无=浅色
+    function isDark() { return document.body && document.body.hasAttribute('data-ds-dark-theme') }
+    function applyTheme() { pill.classList.toggle('dsh-tp-light', !isDark()) }
+    applyTheme()
+    new MutationObserver(applyTheme).observe(
+      document.body || document.documentElement,
+      { attributes: true, attributeFilter: ['data-ds-dark-theme'] }
+    )
 
     const render = (s) => {
       if (!s || !s.usage) return
