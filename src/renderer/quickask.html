@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden;
+    font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif; }
+  body { display: flex; flex-direction: column; padding: 14px; box-sizing: border-box; }
+  .hint { color: rgba(237,237,237,.5); font-size: 11px; margin-bottom: 8px; user-select: none; }
+  input {
+    width: 100%; box-sizing: border-box; padding: 10px 12px; font-size: 14px;
+    color: #edded1; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.16);
+    border-radius: 8px; outline: none;
+  }
+  input:focus { border-color: rgba(230,126,34,.55); }
+  .status { margin-top: 10px; color: rgba(237,237,237,.6); font-size: 12px; line-height: 18px;
+    max-height: 46vh; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
+</style>
+</head>
+<body>
+  <div class="hint">Quick Ask — 回车提问，后台运行，完成后通知 · ESC 关闭</div>
+  <input id="q" placeholder="问点什么…" autofocus>
+  <div class="status" id="st"></div>
+  <script src="./quickask-renderer.js"></script>
+</body>
+</html>
